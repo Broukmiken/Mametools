@@ -1,17 +1,18 @@
 #Region ;**** Directives created by AutoIt3Wrapper_GUI ****
 #AutoIt3Wrapper_Icon=package.ico
-#AutoIt3Wrapper_Outfile=..\..\..\Desktop\GroovyMAME 0.247 - Switchres 2.002l\MameTools_2.0-FREEWARE-LIFETIME.exe
+#AutoIt3Wrapper_Outfile=MameTools_2.0-FREEWARE-LIFETIME.exe
 #AutoIt3Wrapper_Outfile_x64=MameTools_2.0-FREEWARE-LIFETIME.exe
 #AutoIt3Wrapper_Res_Comment=Ce programme développé avec Autoit permet d'automatiser des opérations complexes pour gérer les roms d'arcade ainsi que de télécharger certains programmes/fichiers utiles
 #AutoIt3Wrapper_Res_Description=MAME TOOLS By BROUKMIKEN
-#AutoIt3Wrapper_Res_Fileversion=2.0.0.108
+#AutoIt3Wrapper_Res_Fileversion=4.5
 #AutoIt3Wrapper_Res_Fileversion_AutoIncrement=y
 #AutoIt3Wrapper_Res_ProductName=MAME TOOLS By BROUKMIKEN
 #AutoIt3Wrapper_Res_ProductVersion=2.0 Maj Win11
-#AutoIt3Wrapper_Res_CompanyName=BROUKMIKEN CORP (2019-2022)
-#AutoIt3Wrapper_Res_LegalCopyright=BROUKMIKEN CORP (2019-2022)
-#AutoIt3Wrapper_Res_LegalTradeMarks=BROUKMIKEN CORP (2019-2022)
+#AutoIt3Wrapper_Res_CompanyName=BROUKMIKEN CORP (2019-2023)
+#AutoIt3Wrapper_Res_LegalCopyright=BROUKMIKEN CORP (2019-2023)
+#AutoIt3Wrapper_Res_LegalTradeMarks=BROUKMIKEN CORP (2019-2023)
 #AutoIt3Wrapper_Res_Language=1036
+#AutoIt3Wrapper_Run_AU3Check=n
 #AutoIt3Wrapper_Tidy_Stop_OnError=n
 #EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
 #include <ButtonConstants.au3>
@@ -44,8 +45,14 @@
 
 ;=======================================================================================
 
+;si on défini à zéro cette valeur il n'y aura pas les divers messages,tableaux etc. de debug
+;si on met la valeur à 1 ca mettra tous mes débugs
+Global $version_debug=0
+;=======================================================================================
+
+
 ;ici on défini l'apparence du programme
-$GUI = GUICreate("MAME TOOLS By Broukmiken (2019-2022)  v"& _GetVersion()&" FREEWARE", 503, 272, 273, 188,-1,$WS_EX_ACCEPTFILES) ; ici on récupere la version une fois le script compilé
+$GUI = GUICreate("MAME TOOLS By Broukmiken (2019-2023)  v"& _GetVersion()&" FREEWARE", 503, 272, 273, 188,-1,$WS_EX_ACCEPTFILES) ; ici on récupere la version une fois le script compilé
 GUISetBkColor(0xB9D1EA) ; on défini la couleur de fond
 
 #Region ### START Koda GUI section ### Form=C:\Users\Admin\OneDrive\MonGUI.kxf
@@ -179,9 +186,24 @@ EndFunc
 
 If Ping("progettosnaps.net",4000) >0 Then ;si le ping est supérieur à zero c'est que le site est en ligne
 
+;débug
+	if $version_debug=1 Then
+					msgbox(0,"debug","valeur de Ping('progettosnaps.net',4000) : " & Ping("progettosnaps.net",4000) &@CRLF & "On lance la fonction catégories")
+					Else
+					EndIf
+;fin débug
+
    call("categories") ; lance la fonction categories
     ;sinon si le ping ne répond pas :
 Elseif Ping("progettosnaps.net",6000) =0 Then
+
+;débug
+	if $version_debug=1 Then
+					msgbox(0,"debug","valeur de Ping('progettosnaps.net',4000) : " & Ping("progettosnaps.net",4000)  )
+					Else
+					EndIf
+;fin débug
+
 $Label3 = GUICtrlCreateLabel("Pas de connexion1..",  64, 50, 90, 25)
    GuiCtrlSetData($Label3,"Site inaccessible..." )
 
@@ -202,10 +224,53 @@ EndIf
 ;juste le nom du zip donc le nom de la version est récupéré
 
 If Ping("arcade.mameworld.info",4000) >0 Then ;si le ping est supérieur à zero c'est que le site est en ligne
-   call("arcade") ; lance la fonction arcade
+
+
+
+	; DEBUT DE MON TEST de vérification que la page est la bonne
+	HttpSetUserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 13_2_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36")
+	$sUrl = "http://arcade.mameworld.info/"
+	$oHTTP = ObjCreate("winhttp.winhttprequest.5.1")
+	$oHTTP.Open("GET", $sUrl, False)
+	$oHTTP.Send()
+	if $oHTTP.Status = 200 Then
+   $sReceived = $oHTTP.ResponseText
+	$aFile = StringRegExp($sReceived, 'href=(.+?\.7z)">', 1)
+	EndIf
+
+	if @error then
+		$Label4 = GUICtrlCreateLabel("Pas de connexion...",  64, 110, 90, 55)
+		GuiCtrlSetData($Label4,"Contenu HTML inaccessible..." )
+		;débug
+		if $version_debug=1 Then
+					msgbox(0,"debug","valeur de Ping('arcade.mameworld.info',4000) : " & Ping("arcade.mameworld.info",4000) &@CRLF &"mais il y a erreur ")
+					msgbox(0,"debug","Voila le code HTML QUE SORT LA PAGE http://arcade.mameworld.info " &@CRLF&@CRLF&@CRLF&@CRLF&@CRLF& $sReceived)
+					Else
+					EndIf
+		;fin débug
+
+
+	Else
+
+		;débug
+		if $version_debug=1 Then
+					msgbox(0,"debug","valeur de Ping('http://arcade.mameworld.info',4000) : " & Ping("http://arcade.mameworld.info",4000) &@CRLF & "On lance la fonction arcade")
+					Else
+					EndIf
+		;fin débug
+
+call("arcade") ; c'était la ligne initiale
+EndIf  ; FIN DE MON TEST ICI
+
    ;sinon si le ping ne répond pas :
 Elseif Ping("arcade.mameworld.info",6000) =0 Then
-;$Label4 = GUICtrlCreateLabel("Pas de connexion...",  64, 142, 90,53)
+
+	;débug
+	if $version_debug=1 Then
+					msgbox(0,"debug","valeur de Ping('arcade.mameworld.info',4000) : " & Ping("arcade.mameworld.info",4000)  )
+					Else
+					EndIf
+	;fin débug
 $Label4 = GUICtrlCreateLabel("Pas de connexion...",  64, 110, 90, 55)
 
    GuiCtrlSetData($Label4,"Site inaccessible..." )
@@ -457,7 +522,13 @@ WEnd
 
 Func _GetVersion() ;pour afficher le numero de la version compilée dans la barre du prog
     If @Compiled Then
-			Return FileGetVersion(@AutoItExe) ; ca veut dire de retourner la valeur du numero de version (ne pas tenir compte du @autoitexe) qui s'execute
+	$versionmod= stringsplit(FileGetVersion(@AutoItExe),".")
+	;_ArrayDisplay($versionmod,"tableau de résultat")
+	$versionmodnew = $versionmod[1]&"."&$versionmod[2]
+	return $versionmodnew
+
+
+; ca veut dire de retourner la valeur du numero de version (ne pas tenir compte du @autoitexe) qui s'execute
 		Else
 			Return IniRead(@ScriptFullPath, "FileVersion", "#AutoIt3Wrapper_Res_Fileversion", "pas compilé donc  v inconnue")
 			; tant que le script n'est pas compilé (on l'execute depuis le fichier .au3) on ne peut pas recuperer la valeur
@@ -561,7 +632,8 @@ Func arcade()
 local $adresse
 local $adressecomplete
 
-HttpSetUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:87.0) Gecko/20100101 Firefox/87.0")
+;HttpSetUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:87.0) Gecko/20100101 Firefox/87.0")
+HttpSetUserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 13_2_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36")
 ;$Label4 = GUICtrlCreateLabel("Pas de connexion...",  64, 142, 90,53)
 $Label4 = GUICtrlCreateLabel("Pas de connexion...",  64, 95, 90, 55)
 
@@ -581,7 +653,6 @@ $aFile = StringRegExp($sReceived, 'href=(.+?\.7z)">', 1)
 ;ce qui commence par href= et qui se termine par .7z
 ;ca sort le/les résultats dans un tableau et on prend le 1er resultat $aFile[0] car le 1er résultat c'est ligne zéro
 ;dans le code html il y a href="arcade237.7z donc ca va sortir "arcade237.7z
-;MsgBox(0, "$aFile[0] arcade", $aFile[0])
 
 
 $versionini=stringtrimleft(stringtrimright($aFile[0],3),1)
@@ -1984,7 +2055,8 @@ EndFunc
 
 Func fonctionaide()
 
-   MsgBox($MB_ICONQUESTION,"Information","Il faut choisir l'action à réaliser :" & @CRLF &  @CRLF & _
+   MsgBox($MB_ICONQUESTION,"Information","Mame Tools v "& _GetVersion() & @CRLF & @CRLF & @CRLF & _
+   "Il faut choisir l'action à réaliser :" & @CRLF &  @CRLF & _
    "Au choix : " &@CRLF & @CRLF & @CRLF & _
    "* Gestion des catégories permet de :" & @CRLF &  @CRLF &  @CRLF & _
    "1/Télécharger le fichier zip des catégories"  & @CRLF & @CRLF  &  _
