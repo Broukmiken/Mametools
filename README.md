@@ -1,4 +1,5 @@
 # Mametools
+<img alt="GitHub Downloads (all assets, all releases)" src="https://img.shields.io/github/downloads/Broukmiken/Mametools/total">
 
 Programme écrit avec Autoit
 
